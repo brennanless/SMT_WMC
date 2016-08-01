@@ -53,17 +53,18 @@ def smap_post(sourcename, smap_value, path, uuid, units, timeout): #prior smap_v
 #Fixed lists of paths, uuids, units 
 #############################################    
     
+    
+timeout = 10    
 #Need to re-order these according to the order that they come into the SMT Analytics system.    
-sensor_paths = ['MaR_Sx_EWms_peak_Rd-WoodMC', 'MaR_Nx_EWms_peak_Rd-WoodMC', 'MaR_Cx_truss-WoodMC', 'MaR_Cx_joist-WoodMC',
-	'MiR_Ex_NSms_peak_Rd-WoodMC', 'MiR_Wx_NSms_peak_Rd-WoodMC', 'MiR_Nx_face_peak-WoodMC', 'NWg_Nx_EWms_peak_Rd-WoodMC',
-	'NWg_Nx_truss-WoodMC', 'NWg_Nx_joist-WoodMC']
+sensor_paths = ['/EW52_Nx_Ev_Rd-WMC', '/EW52_Nx_Pk_Rd-WMC', '/EW52_Sx_Pk_Rd-WMC', '/EW52_truss-WMC',
+	'/EW52_joist-WMC']
 sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741-acbc32bae629', '59fbeb35-581b-11e6-b29b-acbc32bae629',
-	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629', '71c34c78-581b-11e6-a46e-acbc32bae629',
-	'7a1bf623-581b-11e6-b5db-acbc32bae629', '7ec67eae-581b-11e6-84d5-acbc32bae629', '855d5c8a-581b-11e6-9ad7-acbc32bae629',
-	'8b8ec8ba-581b-11e6-aece-acbc32bae629']
-sensor_units = ["%","%","%","%","%","%","%","%","%","%"] 
-smap_sourcename = 'SMT_A3'   
-
+	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629']
+sensor_units = 'ohms' 
+smap_sourcename = 'SMT_A3_8910'   
+sensorIDs = range(188027, 188032)
+for id in range(len(sensorIDs)):
+	sensorIDs[id] = str(sensorIDs[id])
 
 #############################################
 #Initiate HTTP session
@@ -77,35 +78,37 @@ password = 'lbl.gov'
 login_url = 'http://analytics.smtresearch.ca/api?action=login&user_username=%s&user_password=%s' %(user_name, password)
 
 s_login = s.get(login_url) #successful
-
+d = xmltodict.parse(s_login.text)
+if d['result']['login'] != 'success':
+	raise SystemExit()
 
 #############################################
 #Construct list of nodes on jobID
 #############################################
 
-jobID = '2770'
-listnode_url = 'http://analytics.smtresearch.ca/api/?action=listNode&jobID=%s' %jobID
-
-s_nodes = s.get(listnode_url) #successful
-d = xmltodict.parse(s_nodes.text) #Convert xml string to dictionary object.
-#Access elements of the dict object like this:
-nodes = []
-for node in range(3):
-    nodes.append(d['result']['nodes']['node'][node]['nodeID'])
+# jobID = '2770'
+# listnode_url = 'http://analytics.smtresearch.ca/api/?action=listNode&jobID=%s' %jobID
+# 
+# s_nodes = s.get(listnode_url) #successful
+# d = xmltodict.parse(s_nodes.text) #Convert xml string to dictionary object.
+# #Access elements of the dict object like this:
+# nodes = []
+# for node in range(3):
+#     nodes.append(d['result']['nodes']['node'][node]['nodeID'])
 
 
 #############################################
 #Construct list of sensors on all nodes
 #############################################
-sensorIDs = []
-
-for node in nodes:
-    listsensor_url = 'http://analytics.smtresearch.ca/api/?action=listSensor&nodeID=%s' %node
-    s_sensors = s.get(listsensor_url) #TooManyRedirects error    
-    d = xmltodict.parse(s_sensors.text)
-    n = len(d['result']['sensors']['sensor'])
-    for sensor in range(n):
-        sensorIDs.append(d['result']['sensors']['sensor'][sensor]['sensorID'])
+# sensorIDs = []
+# 
+# for node in nodes:
+#     listsensor_url = 'http://analytics.smtresearch.ca/api/?action=listSensor&nodeID=%s' %node
+#     s_sensors = s.get(listsensor_url) #TooManyRedirects error    
+#     d = xmltodict.parse(s_sensors.text)
+#     n = len(d['result']['sensors']['sensor'])
+#     for sensor in range(n):
+#         sensorIDs.append(d['result']['sensors']['sensor'][sensor]['sensorID'])
 
 #############################################
 #Construct sensor data for sensor in sensorIDs
@@ -113,7 +116,7 @@ for node in nodes:
 
 #construct start and end times between now and four hours prior.
 endDateTime = datetime.now()
-startDateTime = (datetime.now()-timedelta(hours=4)) 
+startDateTime = (datetime.now()-timedelta(hours=48)) 
 
 startDate = startDateTime.strftime('%Y-%m-%d')
 endDate = endDateTime.strftime('%Y-%m-%d')
@@ -126,43 +129,50 @@ data_dict = {} #Dictionary to fill with pandas Series for each sensor in loop.
 ind = 0
 
 for sensor in sensorIDs:
+    print sensor
     #sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensorData&sensorID=%s&startDate=%s&endDate=%s' %(sensor, startDate, endDate)
     sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensorData&sensorID=%s&startDate=%s&endDate=%s&startTime=%s&endTime=%s' %(sensor, startDate, endDate, startTime, endTime)
     try:
-    	s_data = s.get(sensordata_url) 
-    	d = xmltodict.parse(s_data.text) #Convert xml string to dictionary object.
+        s_data = s.get(sensordata_url) 
+        d = xmltodict.parse(s_data.text) #Convert xml string to dictionary object.
     except:
-    	print 'Failed to retrieve and parse sensor data, will try again in 60 seconds.'
-    	continue
+        print 'Failed to retrieve and parse sensor data, will try again in 60 seconds.'
+        continue
     datetimes = []
     data = []
     if d['result']['readings'] == None:
-    	continue
+        continue
     n = len(d['result']['readings']['reading']) #count the number of data values
     for reading in range(n):
         datetimes.append(d['result']['readings']['reading'][reading]['timestamp'])
-        data.append(d['result']['readings']['reading'][reading]['engUnit'])
-    #data_dict[sensor] = pd.Series(data, index=datetimes)    
+        data.append(int(d['result']['readings']['reading'][reading]['engUnit']))
+    print data[0:5]
     times = []
     for i in range(len(datetimes)):
         times.append(time_str_to_ms(datetimes[i]))
     smap_value = zip(times, data)
     for i in range(len(smap_value)):
         smap_value[i] = list(smap_value[i]) 
+    print smap_value[0]
+    print sensor_paths[ind], sensor_uuids[ind]
     try:
-    	response = smap_post(smap_sourcename, smap_value, sensor_paths[ind], sensor_uuids[ind], sensor_units[ind], timeout)
-	except requests.exceptions.ConnectionError:	
-		print 'Connection error, will try again later.'
-	if not response:
-		count += 1
-	ind += 1 #increment counter
+        response = smap_post(smap_sourcename, smap_value, sensor_paths[ind], sensor_uuids[ind], sensor_units, timeout)
+        ind += 1
+        print ind
+    except requests.exceptions.RequestException as e:	
+        print e
+        continue
+    if not response:
+        continue
+    
     	
     #if we want the data put into a large pandas dataframe:
     #data_dict[sensor] = pd.Series(data, index=datetimes) 
 
 #to create the large data frame the assemblage of indexed Series in data_dict    
 #pdDat = pd.DataFrame(data_dict)
-
+#data_dict[sensor] = pd.Series(data, index=datetimes)   
+#data = [int(x) for x in data] 
 
 #############################################
 #Logoff the server

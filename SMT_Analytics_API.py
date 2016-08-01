@@ -17,6 +17,7 @@ import os
 import requests
 import json
 import pandas as pd
+from datetime import timedelta
 
 def time_str_to_ms(time_str):
     pattern = "%Y-%m-%d %H:%M:%S"
@@ -52,9 +53,15 @@ def smap_post(sourcename, smap_value, path, uuid, units, timeout): #prior smap_v
 #Fixed lists of paths, uuids, units 
 #############################################    
     
-sensor_paths = []
-sensor_uuids = []
-sensor_units = [] 
+#Need to re-order these according to the order that they come into the SMT Analytics system.    
+sensor_paths = ['MaR_Sx_EWms_peak_Rd-WoodMC', 'MaR_Nx_EWms_peak_Rd-WoodMC', 'MaR_Cx_truss-WoodMC', 'MaR_Cx_joist-WoodMC',
+	'MiR_Ex_NSms_peak_Rd-WoodMC', 'MiR_Wx_NSms_peak_Rd-WoodMC', 'MiR_Nx_face_peak-WoodMC', 'NWg_Nx_EWms_peak_Rd-WoodMC',
+	'NWg_Nx_truss-WoodMC', 'NWg_Nx_joist-WoodMC']
+sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741-acbc32bae629', '59fbeb35-581b-11e6-b29b-acbc32bae629',
+	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629', '71c34c78-581b-11e6-a46e-acbc32bae629',
+	'7a1bf623-581b-11e6-b5db-acbc32bae629', '7ec67eae-581b-11e6-84d5-acbc32bae629', '855d5c8a-581b-11e6-9ad7-acbc32bae629',
+	'8b8ec8ba-581b-11e6-aece-acbc32bae629']
+sensor_units = ["%","%","%","%","%","%","%","%","%","%"] 
 smap_sourcename = 'SMT_A3'   
 
 
@@ -104,35 +111,57 @@ for node in nodes:
 #Construct sensor data for sensor in sensorIDs
 #############################################
 
-startDate = '2016-07-20'
-endDate = '2016-07-21'
-startTime = '00:00:00.00'
-endTime = '00:00:00.00'
+#construct start and end times between now and four hours prior.
+endDateTime = datetime.now()
+startDateTime = (datetime.now()-timedelta(hours=4)) 
 
-data_dict = {}
+startDate = startDateTime.strftime('%Y-%m-%d')
+endDate = endDateTime.strftime('%Y-%m-%d')
+startTime = startDateTime.strftime('%H:%M:%S.%f2')[:-5]
+endTime = endDateTime.strftime('%H:%M:%S.%f2')[:-5]
+
+data_dict = {} #Dictionary to fill with pandas Series for each sensor in loop.
+
+
+ind = 0
 
 for sensor in sensorIDs:
-    sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensorData&sensorID=%s&startDate=%s&endDate=%s' %(sensor, startDate, endDate)
-    s_data = s.get(sensordata_url) 
-    d = xmltodict.parse(s_data.text) #Convert xml string to dictionary object.
+    #sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensorData&sensorID=%s&startDate=%s&endDate=%s' %(sensor, startDate, endDate)
+    sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensorData&sensorID=%s&startDate=%s&endDate=%s&startTime=%s&endTime=%s' %(sensor, startDate, endDate, startTime, endTime)
+    try:
+    	s_data = s.get(sensordata_url) 
+    	d = xmltodict.parse(s_data.text) #Convert xml string to dictionary object.
+    except:
+    	print 'Failed to retrieve and parse sensor data, will try again in 60 seconds.'
+    	continue
     datetimes = []
     data = []
+    if d['result']['readings'] == None:
+    	continue
     n = len(d['result']['readings']['reading']) #count the number of data values
     for reading in range(n):
         datetimes.append(d['result']['readings']['reading'][reading]['timestamp'])
         data.append(d['result']['readings']['reading'][reading]['engUnit'])
+    #data_dict[sensor] = pd.Series(data, index=datetimes)    
     times = []
     for i in range(len(datetimes)):
         times.append(time_str_to_ms(datetimes[i]))
     smap_value = zip(times, data)
     for i in range(len(smap_value)):
         smap_value[i] = list(smap_value[i]) 
-    response = smap_post(smap_sourcename, smap_value, sensor_paths[col], sensor_uuids[col], sensor_units, timeout)
+    try:
+    	response = smap_post(smap_sourcename, smap_value, sensor_paths[ind], sensor_uuids[ind], sensor_units[ind], timeout)
+	except requests.exceptions.ConnectionError:	
+		print 'Connection error, will try again later.'
+	if not response:
+		count += 1
+	ind += 1 #increment counter
+    	
     #if we want the data put into a large pandas dataframe:
-    data_dict[sensor] = pd.Series(data, index=datetimes) 
+    #data_dict[sensor] = pd.Series(data, index=datetimes) 
 
 #to create the large data frame the assemblage of indexed Series in data_dict    
-pdDat = pd.DataFrame(data_dict)
+#pdDat = pd.DataFrame(data_dict)
 
 
 #############################################

@@ -83,6 +83,79 @@ if d['result']['login'] != 'success':
 	raise SystemExit()
 
 #############################################
+#Construct sensor data for sensor in sensorIDs
+#############################################
+
+#construct start and end times between now and four hours prior.
+endDateTime = datetime.now()
+startDateTime = (datetime.now()-timedelta(hours=48)) 
+
+startDate = startDateTime.strftime('%Y-%m-%d')
+endDate = endDateTime.strftime('%Y-%m-%d')
+startTime = startDateTime.strftime('%H:%M:%S.%f2')[:-5]
+endTime = endDateTime.strftime('%H:%M:%S.%f2')[:-5]
+
+data_dict = {} #Dictionary to fill with pandas Series for each sensor in loop.
+
+
+ind = 0
+
+for sensor in sensorIDs:
+    #print sensor
+    #sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensorData&sensorID=%s&startDate=%s&endDate=%s' %(sensor, startDate, endDate)
+    sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensorData&sensorID=%s&startDate=%s&endDate=%s&startTime=%s&endTime=%s' %(sensor, startDate, endDate, startTime, endTime)
+    try:
+        s_data = s.get(sensordata_url) 
+        d = xmltodict.parse(s_data.text) #Convert xml string to dictionary object.
+    except:
+        print 'Failed to retrieve and parse sensor data, will try again in 60 seconds.'
+        continue
+    datetimes = []
+    data = []
+    if d['result']['readings'] == None:
+        continue
+    n = len(d['result']['readings']['reading']) #count the number of data values
+    for reading in range(n):
+        datetimes.append(d['result']['readings']['reading'][reading]['timestamp'])
+        data.append(int(d['result']['readings']['reading'][reading]['engUnit']))
+    #print data[0:5]
+    times = []
+    for i in range(len(datetimes)):
+        times.append(time_str_to_ms(datetimes[i]))
+    smap_value = zip(times, data)
+    for i in range(len(smap_value)):
+        smap_value[i] = list(smap_value[i]) 
+    #print smap_value[0]
+    #print sensor_paths[ind], sensor_uuids[ind]
+    try:
+        response = smap_post(smap_sourcename, smap_value, sensor_paths[ind], sensor_uuids[ind], sensor_units, timeout)
+        ind += 1
+        #print ind
+    except requests.exceptions.RequestException as e:	
+        print e
+        continue
+    if not response:
+        continue
+    
+    	
+#if we want the data put into a large pandas dataframe:
+#data_dict[sensor] = pd.Series(data, index=datetimes) 
+
+#to create the large data frame the assemblage of indexed Series in data_dict    
+#pdDat = pd.DataFrame(data_dict)
+#data_dict[sensor] = pd.Series(data, index=datetimes)   
+#data = [int(x) for x in data] 
+
+#############################################
+#Logoff the server
+#############################################
+
+logout_url = 'http://analytics.smtresearch.ca/api/?action=logout'
+s.get(logout_url)
+
+
+
+#############################################
 #Construct list of nodes on jobID
 #############################################
 
@@ -109,75 +182,4 @@ if d['result']['login'] != 'success':
 #     n = len(d['result']['sensors']['sensor'])
 #     for sensor in range(n):
 #         sensorIDs.append(d['result']['sensors']['sensor'][sensor]['sensorID'])
-
-#############################################
-#Construct sensor data for sensor in sensorIDs
-#############################################
-
-#construct start and end times between now and four hours prior.
-endDateTime = datetime.now()
-startDateTime = (datetime.now()-timedelta(hours=48)) 
-
-startDate = startDateTime.strftime('%Y-%m-%d')
-endDate = endDateTime.strftime('%Y-%m-%d')
-startTime = startDateTime.strftime('%H:%M:%S.%f2')[:-5]
-endTime = endDateTime.strftime('%H:%M:%S.%f2')[:-5]
-
-data_dict = {} #Dictionary to fill with pandas Series for each sensor in loop.
-
-
-ind = 0
-
-for sensor in sensorIDs:
-    print sensor
-    #sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensorData&sensorID=%s&startDate=%s&endDate=%s' %(sensor, startDate, endDate)
-    sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensorData&sensorID=%s&startDate=%s&endDate=%s&startTime=%s&endTime=%s' %(sensor, startDate, endDate, startTime, endTime)
-    try:
-        s_data = s.get(sensordata_url) 
-        d = xmltodict.parse(s_data.text) #Convert xml string to dictionary object.
-    except:
-        print 'Failed to retrieve and parse sensor data, will try again in 60 seconds.'
-        continue
-    datetimes = []
-    data = []
-    if d['result']['readings'] == None:
-        continue
-    n = len(d['result']['readings']['reading']) #count the number of data values
-    for reading in range(n):
-        datetimes.append(d['result']['readings']['reading'][reading]['timestamp'])
-        data.append(int(d['result']['readings']['reading'][reading]['engUnit']))
-    print data[0:5]
-    times = []
-    for i in range(len(datetimes)):
-        times.append(time_str_to_ms(datetimes[i]))
-    smap_value = zip(times, data)
-    for i in range(len(smap_value)):
-        smap_value[i] = list(smap_value[i]) 
-    print smap_value[0]
-    print sensor_paths[ind], sensor_uuids[ind]
-    try:
-        response = smap_post(smap_sourcename, smap_value, sensor_paths[ind], sensor_uuids[ind], sensor_units, timeout)
-        ind += 1
-        print ind
-    except requests.exceptions.RequestException as e:	
-        print e
-        continue
-    if not response:
-        continue
-    
-    	
-    #if we want the data put into a large pandas dataframe:
-    #data_dict[sensor] = pd.Series(data, index=datetimes) 
-
-#to create the large data frame the assemblage of indexed Series in data_dict    
-#pdDat = pd.DataFrame(data_dict)
-#data_dict[sensor] = pd.Series(data, index=datetimes)   
-#data = [int(x) for x in data] 
-
-#############################################
-#Logoff the server
-#############################################
-
-logout_url = 'http://analytics.smtresearch.ca/api/?action=logout'
-s.get(logout_url)
 

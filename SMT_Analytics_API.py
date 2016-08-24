@@ -56,13 +56,26 @@ def smap_post(sourcename, smap_value, path, uuid, units, timeout): #prior smap_v
     
 timeout = 10    
 #Need to re-order these according to the order that they come into the SMT Analytics system.    
-sensor_paths = ['/EW52_Nx_Ev_Rd-WMC', '/EW52_Nx_Pk_Rd-WMC', '/EW52_Sx_Pk_Rd-WMC', '/EW52_truss-WMC',
+sensor_paths = ['/EW52_Nx_Ev_Rd-WMC', '/EW52_Nx_Pk_Rd-WMC', '/EW52_Sx_Pk_Rd-WMC', '/EW52_truss-WMC', 
 	'/EW52_joist-WMC']
-sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741-acbc32bae629', '59fbeb35-581b-11e6-b29b-acbc32bae629',
+# sensor_paths = ['/EW52_Nx_Ev_Rd-WMC', '/EW52_Nx_Pk_Rd-WMC', '/EW52_Sx_Pk_Rd-WMC', '/EW52_truss-WMC',
+# 	'/EW52_joist-WMC', '/NS33_Ex_Rd-WMC', '/NS33_Wx_Rd-WMC', '/NS33_truss-WMC', '/NS33_joist-WMC', '/NS33_Nx_face_peak-WMC', '/NWg_Nx_peak_Rd-WMC']	
+sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741-acbc32bae629', '59fbeb35-581b-11e6-b29b-acbc32bae629', 
 	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629']
+# sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741-acbc32bae629', '59fbeb35-581b-11e6-b29b-acbc32bae629',
+# 	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629', 'fb10bf8a-6a4f-11e6-a772-acbc32bae629', '05dc89cc-6a50-11e6-bc2a-acbc32bae629',
+# 	'0fa4b140-6a50-11e6-bc46-acbc32bae629', '15a782f0-6a50-11e6-9b83-acbc32bae629', '1ba52891-6a50-11e6-9967-acbc32bae629', '211f6f8a-6a50-11e6-8777-acbc32bae629']	
 sensor_units = 'ohms' 
-smap_sourcename = 'SMT_A3_8910'   
-sensorIDs = range(188027, 188032)
+smap_sourcename = 'SMT_A3_8910'  
+#smap_sourcename = 'SMT_A3' 
+ 
+sensorIDs = range(188027, 188032) #senor IDs for SMT A3 8910
+
+# Node8909 = range(188040, 188046) #sensor IDs for SMT A3 8909
+# 
+# for sens in Node8909:
+# 	sensorIDs.append(sens) #Append 8909 IDs to 8910 IDs list.
+	
 for id in range(len(sensorIDs)):
 	sensorIDs[id] = str(sensorIDs[id])
 

@@ -67,7 +67,7 @@ sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741
 	'0fa4b140-6a50-11e6-bc46-acbc32bae629', '15a782f0-6a50-11e6-9b83-acbc32bae629', '1ba52891-6a50-11e6-9967-acbc32bae629', '211f6f8a-6a50-11e6-8777-acbc32bae629']	
 sensor_units = 'ohms' 
 #smap_sourcename = 'SMT_A3_8910'  
-smap_sourcename = 'SMT_A3' 
+smap_sourcename = 'Fresno_WoodMC_RawOhms' 
  
 sensorIDs = range(188027, 188032) #senor IDs for SMT A3 8910
 

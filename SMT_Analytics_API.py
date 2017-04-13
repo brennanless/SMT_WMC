@@ -59,17 +59,20 @@ timeout = 10
 # sensor_paths = ['/EW52_Nx_Ev_Rd-WMC', '/EW52_Nx_Pk_Rd-WMC', '/EW52_Sx_Pk_Rd-WMC', '/EW52_truss-WMC', 
 # 	'/EW52_joist-WMC']
 sensor_paths = ['/EW52_Nx_Ev_Rd-WMC', '/EW52_Nx_Pk_Rd-WMC', '/EW52_Sx_Pk_Rd-WMC', '/EW52_truss-WMC',
-	'/EW52_joist-WMC', '/NS33_Ex_Rd-WMC', '/NS33_Wx_Rd-WMC', '/NWg_Nx_peak_Rd-WMC', '/NS33_Nx_face_peak-WMC', '/NS33_joist-WMC', '/NS33_truss-WMC']	
+	'/EW52_joist-WMC', '/EW52_Nx_Pk_Rd_2535-WMC', '/EW52_Nx_Pk_Rd_3345-WMC', '/EW52_Nx_Pk_Rd_backup-TM', '/NS33_Ex_Rd-WMC', 
+	'/NS33_Wx_Rd-WMC', '/NWg_Nx_peak_Rd-WMC', '/NS33_Nx_face_peak-WMC', '/NS33_joist-WMC', '/NS33_truss-WMC']	
 # sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741-acbc32bae629', '59fbeb35-581b-11e6-b29b-acbc32bae629', 
 # 	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629']
 sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741-acbc32bae629', '59fbeb35-581b-11e6-b29b-acbc32bae629',
-	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629', 'fb10bf8a-6a4f-11e6-a772-acbc32bae629', '05dc89cc-6a50-11e6-bc2a-acbc32bae629',
-	'0fa4b140-6a50-11e6-bc46-acbc32bae629', '15a782f0-6a50-11e6-9b83-acbc32bae629', '1ba52891-6a50-11e6-9967-acbc32bae629', '211f6f8a-6a50-11e6-8777-acbc32bae629']	
+	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629', 'b160f785-208e-11e7-bae7-acbc32bae629', 
+	'ba85ba5e-208e-11e7-afb2-acbc32bae629', 'c0e85ce3-208e-11e7-9551-acbc32bae629', 'fb10bf8a-6a4f-11e6-a772-acbc32bae629', 
+	'05dc89cc-6a50-11e6-bc2a-acbc32bae629', '0fa4b140-6a50-11e6-bc46-acbc32bae629', '15a782f0-6a50-11e6-9b83-acbc32bae629', 
+	'1ba52891-6a50-11e6-9967-acbc32bae629', '211f6f8a-6a50-11e6-8777-acbc32bae629']	
 sensor_units = 'ohms' 
 #smap_sourcename = 'SMT_A3_8910'  
 smap_sourcename = 'Fresno_WoodMC_RawOhms' 
  
-sensorIDs = range(188027, 188032) #senor IDs for SMT A3 8910
+sensorIDs = range(188027, 188035) #senor IDs for SMT A3 8910, was 188032
 
 Node8909 = range(188040, 188046) #sensor IDs for SMT A3 8909
 
@@ -101,7 +104,7 @@ if d['result']['login'] != 'success':
 
 #construct start and end times between now and four hours prior.
 endDateTime = datetime.now()
-startDateTime = (datetime.now()-timedelta(hours=48)) 
+startDateTime = (datetime.now()-timedelta(hours=360)) #was 48
 
 startDate = startDateTime.strftime('%Y-%m-%d')
 endDate = endDateTime.strftime('%Y-%m-%d')

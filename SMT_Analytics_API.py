@@ -104,7 +104,7 @@ if d['result']['login'] != 'success':
 
 #construct start and end times between now and four hours prior.
 endDateTime = datetime.now()
-startDateTime = (datetime.now()-timedelta(hours=360)) #was 48
+startDateTime = (datetime.now()-timedelta(hours=48))
 
 startDate = startDateTime.strftime('%Y-%m-%d')
 endDate = endDateTime.strftime('%Y-%m-%d')

@@ -51,6 +51,7 @@ def smap_post(sourcename, smap_value, path, uuid, units, timeout): #prior smap_v
     
 #############################################
 #Fixed lists of paths, uuids, units 
+#FRESNO
 #############################################    
     
     
@@ -60,27 +61,78 @@ timeout = 10
 # 	'/EW52_joist-WMC']
 sensor_paths = ['/EW52_Nx_Ev_Rd-WMC', '/EW52_Nx_Pk_Rd-WMC', '/EW52_Sx_Pk_Rd-WMC', '/EW52_truss-WMC',
 	'/EW52_joist-WMC', '/EW52_Nx_Pk_Rd_2535-WMC', '/EW52_Nx_Pk_Rd_3345-WMC', '/EW52_Nx_Pk_Rd_backup-TM', '/NS33_Ex_Rd-WMC', 
-	'/NS33_Wx_Rd-WMC', '/NWg_Nx_peak_Rd-WMC', '/NS33_Nx_face_peak-WMC', '/NS33_joist-WMC', '/NS33_truss-WMC']	
+	'/NS33_Wx_Rd-WMC', '/NWg_Nx_peak_Rd-WMC', '/NS33_Nx_face_peak-WMC', '/NS33_joist-WMC', '/NS33_truss-WMC',
+     '/NS50E_Wx_peak_Rd-WMC', '/NS50W_Ex_peak_Rd-WMC', '/EW26S_Nx_peak_Rd-WMC', '/EW26N_Nx_peak_Rd-WMC',
+     '/EW26N_web_hh-WMC', '/EW26N_cord_floor-WMC']	
 # sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741-acbc32bae629', '59fbeb35-581b-11e6-b29b-acbc32bae629', 
 # 	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629']
 sensor_uuids = ['4da00794-581b-11e6-8fff-acbc32bae629', '53c2ee2e-581b-11e6-9741-acbc32bae629', '59fbeb35-581b-11e6-b29b-acbc32bae629',
 	'656d0914-581b-11e6-aaf2-acbc32bae629', '6b66e57d-581b-11e6-8879-acbc32bae629', 'b160f785-208e-11e7-bae7-acbc32bae629', 
 	'ba85ba5e-208e-11e7-afb2-acbc32bae629', 'c0e85ce3-208e-11e7-9551-acbc32bae629', 'fb10bf8a-6a4f-11e6-a772-acbc32bae629', 
 	'05dc89cc-6a50-11e6-bc2a-acbc32bae629', '0fa4b140-6a50-11e6-bc46-acbc32bae629', '15a782f0-6a50-11e6-9b83-acbc32bae629', 
-	'1ba52891-6a50-11e6-9967-acbc32bae629', '211f6f8a-6a50-11e6-8777-acbc32bae629']	
+	'1ba52891-6a50-11e6-9967-acbc32bae629', '211f6f8a-6a50-11e6-8777-acbc32bae629', 'fcd77148-55dd-11e7-9af0-001aa07ad31d',
+     '253c01bc-55de-11e7-860d-001aa07ad31d', '2a610eee-55de-11e7-a385-001aa07ad31d', '2f2cf1f4-55de-11e7-92e4-001aa07ad31d',
+     '34e2698a-55de-11e7-8939-001aa07ad31d', '3984a868-55de-11e7-85c6-001aa07ad31d']	
 sensor_units = 'ohms' 
 #smap_sourcename = 'SMT_A3_8910'  
-smap_sourcename = 'Fresno_WoodMC_RawOhms' 
+smap_sourcename = ['Fresno_WoodMC_RawOhms'] * 14 + ['Clovis_WoodMC_RawOhms'] * 6 #14 sensors for Fresno. 6 sensors for Clovis. 
  
 sensorIDs = range(188027, 188035) #senor IDs for SMT A3 8910, was 188032
 
 Node8909 = range(188040, 188046) #sensor IDs for SMT A3 8909
 
+Node8903 = range(214746, 214752) #snesor IDs for SMT A3 8903
+
 for sens in Node8909:
 	sensorIDs.append(sens) #Append 8909 IDs to 8910 IDs list.
+ 
+for sens in Node8903:
+	sensorIDs.append(sens) #Append 8909 IDs to 8910 IDs list. 
 	
 for id in range(len(sensorIDs)):
 	sensorIDs[id] = str(sensorIDs[id])
+	
+#############################################
+#Fixed lists of paths, uuids, units 
+#CLOVIS
+#############################################    
+
+
+
+
+
+    
+    
+# timeout = 10    
+# #Need to re-order these according to the order that they come into the SMT Analytics system.    
+# 
+# sensor_paths = ['/NS50E_Wx_peak_Rd-WMC', 
+# '/NS50W_Ex_peak_Rd-WMC', 
+# '/EW26S_Nx_peak_Rd-WMC', 
+# '/EW26N_Nx_peak_Rd-WMC',
+# '/EW26N_web_hh-WMC', 
+# '/EW26N_cord_floor-WMC']	
+# 
+# sensor_uuids = ['fcd77148-55dd-11e7-9af0-001aa07ad31d',
+# '253c01bc-55de-11e7-860d-001aa07ad31d',
+# '2a610eee-55de-11e7-a385-001aa07ad31d',
+# '2f2cf1f4-55de-11e7-92e4-001aa07ad31d',
+# '34e2698a-55de-11e7-8939-001aa07ad31d',
+# '3984a868-55de-11e7-85c6-001aa07ad31d']
+# 	
+# sensor_units = 'ohms' 
+# 
+# smap_sourcename = 'Clovis_WoodMC_RawOhms' 
+ 
+# sensorIDs = range() #senor IDs for SMT A3 8910, was 188032
+# 
+# Node8909 = range() #sensor IDs for SMT A3 8909
+
+# for sens in Node8909:
+# 	sensorIDs.append(sens) #Append 8909 IDs to 8910 IDs list.
+# 	
+# for id in range(len(sensorIDs)):
+# 	sensorIDs[id] = str(sensorIDs[id])	
 
 #############################################
 #Initiate HTTP session
@@ -98,13 +150,17 @@ d = xmltodict.parse(s_login.text)
 if d['result']['login'] != 'success':
 	raise SystemExit()
 
+
+#sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listNode&jobID=2770'
+#sensordata_url = 'http://analytics.smtresearch.ca/api/?action=listSensor&nodeID=25004'
+
 #############################################
 #Construct sensor data for sensor in sensorIDs
 #############################################
 
 #construct start and end times between now and four hours prior.
 endDateTime = datetime.now()
-startDateTime = (datetime.now()-timedelta(hours=288)) #48
+startDateTime = (datetime.now()-timedelta(hours=120))
 
 startDate = startDateTime.strftime('%Y-%m-%d')
 endDate = endDateTime.strftime('%Y-%m-%d')
@@ -144,7 +200,7 @@ for sensor in sensorIDs:
     #print smap_value[0]
     #print sensor_paths[ind], sensor_uuids[ind]
     try:
-        response = smap_post(smap_sourcename, smap_value, sensor_paths[ind], sensor_uuids[ind], sensor_units, timeout)
+        response = smap_post(smap_sourcename[ind], smap_value, sensor_paths[ind], sensor_uuids[ind], sensor_units, timeout)
         ind += 1
         #print ind
     except requests.exceptions.RequestException as e:	
